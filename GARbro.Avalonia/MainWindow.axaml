@@ -1,0 +1,81 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GARbro.Avalonia.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        x:Class="GARbro.Avalonia.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="GARbro (Avalonia)">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_View" />
+            <MenuItem Header="_Help" />
+        </Menu>
+
+        <!-- Address Bar -->
+        <Border Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" Padding="5">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                <Button Grid.Column="0" Margin="0,0,5,0" Width="32" Height="32" Padding="4">
+                    <materialIcons:MaterialIcon Kind="ArrowLeft" />
+                </Button>
+                <Button Grid.Column="1" Margin="0,0,5,0" Width="32" Height="32" Padding="4">
+                    <materialIcons:MaterialIcon Kind="ArrowRight" />
+                </Button>
+                <TextBox Grid.Column="2" Text="{Binding CurrentDirectory}" VerticalAlignment="Center"/>
+                <Button Grid.Column="3" Margin="5,0,0,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateToCommand}" CommandParameter="{Binding CurrentDirectory}">
+                    <materialIcons:MaterialIcon Kind="Refresh" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Splitter -->
+        <Grid Grid.Row="2" ColumnDefinitions="250,5,*">
+            <!-- Left Pane: File System TreeView -->
+            <TreeView Grid.Column="0" ItemsSource="{Binding LeftPaneItems}" SelectionChanged="TreeView_SelectionChanged" BorderThickness="0,1,0,0" BorderBrush="Gray">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <materialIcons:MaterialIcon Kind="Folder" Width="16" Height="16" Foreground="#FFD700" />
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>
+
+            <!-- Right Pane: Archive / Folder Contents -->
+            <DataGrid Grid.Column="2" ItemsSource="{Binding RightPaneItems}" DoubleTapped="DataGrid_DoubleTapped"
+                      AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal"
+                      CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True"
+                      BorderThickness="1,1,0,0" BorderBrush="Gray">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Name" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="5" Margin="5,0">
+                                    <materialIcons:MaterialIcon Kind="{Binding IconKind}" Width="16" Height="16" />
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="100"/>
+                    <DataGridTextColumn Header="Offset" Binding="{Binding Offset}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Window>
