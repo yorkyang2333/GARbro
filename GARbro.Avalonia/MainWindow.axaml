@@ -17,16 +17,17 @@
         <!-- Menu Bar -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" />
-                <MenuItem Header="_Extract" />
+                <MenuItem Header="_Open" Click="MenuItem_Open_Click" HotKey="{OnPlatform 'Ctrl+O', macOS='Cmd+O'}" />
+                <MenuItem Header="_Create Archive..." IsEnabled="False" />
+                <MenuItem Header="_Convert Media..." IsEnabled="False" />
+                <MenuItem Header="_Recent Files" IsEnabled="False" />
                 <MenuItem Header="-" />
-                <MenuItem Header="_Exit" />
+                <MenuItem Header="_Exit" Click="MenuItem_Exit_Click" HotKey="{OnPlatform 'Ctrl+Q', macOS='Cmd+Q'}" />
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="_Refresh" />
-            </MenuItem>
-            <MenuItem Header="_Tools">
-                <MenuItem Header="_Convert..." />
+                <MenuItem Header="_Preferences" IsEnabled="False" HotKey="{OnPlatform 'Ctrl+P', macOS='Cmd+P'}" />
+                <MenuItem Header="-" />
+                <MenuItem Header="_Refresh" Click="MenuItem_Refresh_Click" HotKey="F5" />
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About GARbro" Click="MenuItem_About_Click" />
@@ -50,10 +51,15 @@
         </Border>
 
         <!-- Main Content -->
-        <DataGrid Grid.Row="2" ItemsSource="{Binding RightPaneItems}" DoubleTapped="DataGrid_DoubleTapped"
+        <DataGrid Name="FileGrid" Grid.Row="2" ItemsSource="{Binding RightPaneItems}" DoubleTapped="DataGrid_DoubleTapped"
                   AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal"
                   CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True"
                   BorderThickness="0,1,0,0" BorderBrush="Gray">
+            <DataGrid.ContextMenu>
+                <ContextMenu Opening="ContextMenu_Opening">
+                    <MenuItem Name="MenuExtract" Header="Extract Selected..." Click="MenuItem_Extract_Click" HotKey="F4" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="Name" Width="*">
                         <DataGridTemplateColumn.CellTemplate>

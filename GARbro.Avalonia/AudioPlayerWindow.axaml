@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="GARbro.Avalonia.AudioPlayerWindow"
+        Title="Audio Player" Width="400" Height="150" WindowStartupLocation="CenterOwner" CanResize="False">
+    <Grid RowDefinitions="Auto, Auto, Auto" Margin="20">
+        <TextBlock Name="FileNameText" Grid.Row="0" Text="Unknown File" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,10" TextTrimming="CharacterEllipsis"/>
+        
+        <ProgressBar Name="PlaybackProgress" Grid.Row="1" Minimum="0" Maximum="100" Value="0" Height="10" Margin="0,10,0,10" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15">
+            <Button Name="PlayButton" Click="PlayButton_Click" Width="50" Height="50" CornerRadius="25">
+                <materialIcons:MaterialIcon Kind="Play" Width="30" Height="30"/>
+            </Button>
+            <Button Name="PauseButton" Click="PauseButton_Click" Width="50" Height="50" CornerRadius="25">
+                <materialIcons:MaterialIcon Kind="Pause" Width="30" Height="30"/>
+            </Button>
+            <Button Name="StopButton" Click="StopButton_Click" Width="50" Height="50" CornerRadius="25">
+                <materialIcons:MaterialIcon Kind="Stop" Width="30" Height="30"/>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

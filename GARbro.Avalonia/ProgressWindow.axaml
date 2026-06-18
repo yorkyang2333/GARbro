@@ -1,0 +1,10 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GARbro.Avalonia.ProgressWindow"
+        Title="Extracting..." Width="400" Height="150" WindowStartupLocation="CenterOwner" CanResize="False">
+    <StackPanel Margin="20" Spacing="10" VerticalAlignment="Center">
+        <TextBlock Name="StatusText" Text="Extracting files..." HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        <ProgressBar Name="ExtractionProgress" Minimum="0" Maximum="100" Value="0" Height="20" />
+        <Button Content="Cancel" Name="CancelButton" Click="CancelButton_Click" HorizontalAlignment="Center" />
+    </StackPanel>
+</Window>

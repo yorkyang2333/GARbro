@@ -105,7 +105,10 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private void OpenArchive(string filePath)
+    [ObservableProperty]
+    private ArcFile? _currentArchive;
+
+    public void OpenArchive(string filePath)
     {
         if (string.IsNullOrEmpty(filePath)) return;
         
@@ -114,6 +117,7 @@ public partial class MainWindowViewModel : ViewModelBase
             var arc = ArcFile.TryOpen(filePath);
             if (arc != null && arc.Dir != null)
             {
+                CurrentArchive = arc;
                 CurrentDirectory = filePath;
                 RightPaneItems.Clear();
                 
@@ -145,7 +149,8 @@ public partial class MainWindowViewModel : ViewModelBase
                         Offset = entry.Offset,
                         IconKind = icon,
                         IsDirectory = false,
-                        FullPath = "" // Not a physical file
+                        FullPath = "", // Not a physical file
+                        Entry = entry
                     });
                 }
             }
@@ -168,4 +173,5 @@ public class EntryViewModel
     public string IconKind { get; set; } = "FileDocumentOutline";
     public bool IsDirectory { get; set; }
     public string FullPath { get; set; } = string.Empty;
+    public Entry? Entry { get; set; }
 }

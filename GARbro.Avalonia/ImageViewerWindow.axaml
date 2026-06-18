@@ -1,0 +1,8 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GARbro.Avalonia.ImageViewerWindow"
+        Title="Image Viewer" Width="800" Height="600" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Image Name="MainImage" Stretch="Uniform" />
+    </Grid>
+</Window>

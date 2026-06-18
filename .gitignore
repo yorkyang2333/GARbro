@@ -15,3 +15,4 @@ Makefile
 packages
 .nuget
 .vs
+.DS_Store
