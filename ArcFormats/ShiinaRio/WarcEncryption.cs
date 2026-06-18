@@ -1345,7 +1345,7 @@ namespace GameRes.Formats.ShiinaRio
                     }
                     var value = MemoryMarshal.Read<uint> (data.AsSpan (index+0x100));
                     value ^= length;
-                    MemoryMarshal.Write<uint> (data.AsSpan (index+0x100), ref value);
+                    MemoryMarshal.Write<uint> (data.AsSpan (index+0x100), in value);
                 }
             }
         }
@@ -1385,7 +1385,7 @@ namespace GameRes.Formats.ShiinaRio
                     }
                     var value = MemoryMarshal.Read<uint> (data.AsSpan(index+0x104));
                     value ^= length;
-                    MemoryMarshal.Write<uint> (data.AsSpan (index+0x104), ref value);
+                    MemoryMarshal.Write<uint> (data.AsSpan (index+0x104), in value);
                 }
             }
         }

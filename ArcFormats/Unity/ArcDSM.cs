@@ -73,7 +73,7 @@ namespace GameRes.Formats.Unity
 
         static byte[] DecryptString (string sourceString, string password)
         {
-            var rijndaelManaged = new RijndaelManaged();
+            var rijndaelManaged = Aes.Create();
             byte[] key, iv;
             GenerateKeyFromPassword (password, rijndaelManaged.KeySize, out key, rijndaelManaged.BlockSize, out iv);
             rijndaelManaged.Key = key;
@@ -89,8 +89,7 @@ namespace GameRes.Formats.Unity
 
         static void GenerateKeyFromPassword (string password, int keySize, out byte[] key, int blockSize, out byte[] iv)
         {
-            var rfc2898DeriveBytes = new Rfc2898DeriveBytes (password, DefaultSalt);
-            rfc2898DeriveBytes.IterationCount = 1000;
+            var rfc2898DeriveBytes = new Rfc2898DeriveBytes (password, DefaultSalt, 1000, HashAlgorithmName.SHA1);
             key = rfc2898DeriveBytes.GetBytes (keySize / 8);
             iv = rfc2898DeriveBytes.GetBytes (blockSize / 8);
         }

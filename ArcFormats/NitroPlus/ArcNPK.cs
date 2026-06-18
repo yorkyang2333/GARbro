@@ -327,7 +327,7 @@ namespace GameRes.Formats.NitroPlus
 
         byte[] GenerateAesIV ()
         {
-            using (var rng = new RNGCryptoServiceProvider())
+            using (var rng = RandomNumberGenerator.Create())
             {
                 var iv = new byte[0x10];
                 rng.GetBytes (iv);

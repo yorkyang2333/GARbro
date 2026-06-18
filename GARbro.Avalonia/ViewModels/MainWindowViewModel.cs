@@ -13,27 +13,18 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _currentDirectory = string.Empty;
 
-    public ObservableCollection<DirectoryNodeViewModel> LeftPaneItems { get; } = new();
     public ObservableCollection<EntryViewModel> RightPaneItems { get; } = new();
 
     public MainWindowViewModel()
     {
-        LoadDrives();
-        
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         if (Directory.Exists(desktop))
         {
             NavigateTo(desktop);
         }
-    }
-
-    private void LoadDrives()
-    {
-        LeftPaneItems.Clear();
-        foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        else 
         {
-            var node = new DirectoryNodeViewModel(drive.RootDirectory.FullName, drive.Name);
-            LeftPaneItems.Add(node);
+            NavigateTo(Directory.GetCurrentDirectory());
         }
     }
 
@@ -166,56 +157,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 }
 
-public partial class DirectoryNodeViewModel : ViewModelBase
-{
-    public string FullPath { get; }
-    public string Name { get; }
 
-    [ObservableProperty]
-    private bool _isExpanded;
-
-    public ObservableCollection<DirectoryNodeViewModel> Children { get; } = new();
-
-    public DirectoryNodeViewModel(string fullPath, string name)
-    {
-        FullPath = fullPath;
-        Name = name;
-
-        // Dummy node to show expansion arrow
-        if (!string.IsNullOrEmpty(fullPath))
-        {
-            Children.Add(new DirectoryNodeViewModel(string.Empty, "Loading..."));
-        }
-    }
-
-    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-        if (e.PropertyName == nameof(IsExpanded) && IsExpanded)
-        {
-            LoadChildren();
-        }
-    }
-
-    private void LoadChildren()
-    {
-        if (Children.Count == 1 && Children[0].FullPath == string.Empty)
-        {
-            Children.Clear();
-            try
-            {
-                foreach (var dir in Directory.GetDirectories(FullPath).OrderBy(d => d))
-                {
-                    Children.Add(new DirectoryNodeViewModel(dir, Path.GetFileName(dir)));
-                }
-            }
-            catch
-            {
-                // Access denied or other error
-            }
-        }
-    }
-}
 
 public class EntryViewModel
 {

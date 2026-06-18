@@ -193,7 +193,7 @@ namespace GameRes.Formats.Primel
                 break;
 
             case 0xA0000: // AES
-                using (var aes = Rijndael.Create())
+                using (var aes = Aes.Create())
                 {
                     aes.Mode = CipherMode.CFB;
                     aes.Padding = PaddingMode.Zeros;

@@ -17,10 +17,20 @@
         <!-- Menu Bar -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
+                <MenuItem Header="_Open" />
+                <MenuItem Header="_Extract" />
+                <MenuItem Header="-" />
                 <MenuItem Header="_Exit" />
             </MenuItem>
-            <MenuItem Header="_View" />
-            <MenuItem Header="_Help" />
+            <MenuItem Header="_View">
+                <MenuItem Header="_Refresh" />
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Convert..." />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About GARbro" Click="MenuItem_About_Click" />
+            </MenuItem>
         </Menu>
 
         <!-- Address Bar -->
@@ -39,27 +49,11 @@
             </Grid>
         </Border>
 
-        <!-- Main Content Splitter -->
-        <Grid Grid.Row="2" ColumnDefinitions="250,5,*">
-            <!-- Left Pane: File System TreeView -->
-            <TreeView Grid.Column="0" ItemsSource="{Binding LeftPaneItems}" SelectionChanged="TreeView_SelectionChanged" BorderThickness="0,1,0,0" BorderBrush="Gray">
-                <TreeView.ItemTemplate>
-                    <TreeDataTemplate ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <materialIcons:MaterialIcon Kind="Folder" Width="16" Height="16" Foreground="#FFD700" />
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </TreeDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-
-            <GridSplitter Grid.Column="1" Background="Transparent" ResizeDirection="Columns"/>
-
-            <!-- Right Pane: Archive / Folder Contents -->
-            <DataGrid Grid.Column="2" ItemsSource="{Binding RightPaneItems}" DoubleTapped="DataGrid_DoubleTapped"
-                      AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal"
-                      CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True"
-                      BorderThickness="1,1,0,0" BorderBrush="Gray">
+        <!-- Main Content -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding RightPaneItems}" DoubleTapped="DataGrid_DoubleTapped"
+                  AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal"
+                  CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True"
+                  BorderThickness="0,1,0,0" BorderBrush="Gray">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Header="Name" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
@@ -76,6 +70,5 @@
                     <DataGridTextColumn Header="Offset" Binding="{Binding Offset}" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>
-        </Grid>
     </Grid>
 </Window>
