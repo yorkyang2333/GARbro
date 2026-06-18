@@ -30,8 +30,6 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Windows.Navigation;
 using static GameRes.Formats.DxLib.Dx8Opener;
 
 
@@ -110,21 +108,14 @@ namespace GameRes.Formats.DxLib
         
         
 
-        public override ResourceOptions GetOptions(object widget)
+        public override ResourceOptions GetOptions (object w)
         {
-            if (widget is GUI.WidgetDXA)
-            {
-                return new DXAOpts
-                {
-                    Keyword = ((GUI.WidgetDXA)widget).Password.Text
-                };
-            }
             return GetDefaultOptions();
         }
 
         public override object GetAccessWidget()
         {
-            return new GUI.WidgetDXA();
+            return null;
         }
 
         public override ArcFile TryOpen (ArcView file)

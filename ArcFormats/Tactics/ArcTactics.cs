@@ -391,7 +391,7 @@ namespace GameRes.Formats.Tactics
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetTactics();
+            return null;
         }
 
         public static Dictionary<string, ArcScheme> KnownSchemes = new Dictionary<string, ArcScheme>();

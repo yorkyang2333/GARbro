@@ -188,7 +188,7 @@ namespace GameRes.Formats.Eagls
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetEAGLS();
+            return null;
         }
 
         IEntryEncryption QueryEncryption ()

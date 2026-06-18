@@ -324,7 +324,7 @@ namespace GameRes.Formats.Musica
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetPAZ (this);
+            return null;
         }
 
         PazScheme GetScheme (string title)

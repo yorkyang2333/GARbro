@@ -424,12 +424,12 @@ NextEntry:
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateXP3Widget();
+            return null;
         }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetXP3();
+            return null;
         }
 
         ICrypt QueryCryptAlgorithm (ArcView file)
@@ -667,7 +667,7 @@ NextEntry:
                 throw new FileSizeException();
 
             using (var map = MemoryMappedFile.CreateFromFile (file, null, 0,
-                    MemoryMappedFileAccess.Read, null, HandleInheritability.None, true))
+                    MemoryMappedFileAccess.Read, HandleInheritability.None, true))
             {
                 uint unpacked_size    = (uint)file.Length;
                 xp3entry.UnpackedSize = (uint)unpacked_size;

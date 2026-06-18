@@ -345,7 +345,7 @@ namespace GameRes.Formats.Lucifen
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetLPK();
+            return null;
         }
 
         EncryptionScheme QueryEncryptionScheme (string arc_name)

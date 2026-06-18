@@ -98,7 +98,7 @@ namespace GameRes.Formats.Fs
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreatePDWidget();
+            return null;
         }
 
         public override void Create (Stream output, IEnumerable<Entry> list, ResourceOptions options,

@@ -116,17 +116,11 @@ namespace GameRes.Formats.FC01
             return new McgOptions { Key = Properties.Settings.Default.MCGLastKey };
         }
 
-        public override ResourceOptions GetOptions (object widget)
-        {
-            var w = widget as GUI.WidgetMCG;
-            if (null != w)
-                Properties.Settings.Default.MCGLastKey = w.GetKey ();
-            return GetDefaultOptions();
-        }
+        public override ResourceOptions GetOptions (object w) { return GetDefaultOptions(); }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetMCG();
+            return null;
         }
     }
 

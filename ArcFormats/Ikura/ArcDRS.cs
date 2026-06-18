@@ -213,7 +213,7 @@ namespace GameRes.Formats.Ikura
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetISF();
+            return null;
         }
 
         private byte[] QuerySecret ()

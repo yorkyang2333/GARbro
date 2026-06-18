@@ -362,7 +362,7 @@ namespace GameRes.Formats.Cyberworks
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetBELL();
+            return null;
         }
 
         public static AImageScheme GetScheme (string title)

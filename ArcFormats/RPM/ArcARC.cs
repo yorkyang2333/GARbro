@@ -146,7 +146,7 @@ namespace GameRes.Formats.Rpm
 
         public override object GetAccessWidget ()
         {
-            return new WidgetARC();
+            return null;
         }
 
         EncryptionScheme QueryScheme ()

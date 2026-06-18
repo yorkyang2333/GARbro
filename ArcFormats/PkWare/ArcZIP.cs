@@ -213,16 +213,11 @@ namespace GameRes.Formats.PkWare
             };
         }
 
-        public override ResourceOptions GetOptions (object widget)
-        {
-            if (widget is GUI.WidgetZIP)
-                Properties.Settings.Default.ZIPPassword = ((GUI.WidgetZIP)widget).Password.Text;
-            return GetDefaultOptions();
-        }
+        public override ResourceOptions GetOptions (object w) { return GetDefaultOptions(); }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetZIP (DefaultScheme.KnownKeys);
+            return null;
         }
 
         // TODO: GUI widget for options

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace GameRes.Formats.Properties {
     

@@ -137,7 +137,7 @@ namespace GameRes.Formats.Selene
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetKCAP();
+            return null;
         }
 
         public override ResourceOptions GetDefaultOptions ()

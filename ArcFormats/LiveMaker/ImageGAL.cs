@@ -173,7 +173,7 @@ namespace GameRes.Formats.LiveMaker
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetGAL (KnownKeys);
+            return null;
         }
 
         internal uint QueryKey ()

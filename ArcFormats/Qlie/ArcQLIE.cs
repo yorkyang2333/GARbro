@@ -278,7 +278,7 @@ namespace GameRes.Formats.Qlie
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetQLIE();
+            return null;
         }
 
         byte[] QueryEncryption (ArcView file)

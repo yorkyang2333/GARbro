@@ -391,12 +391,12 @@ namespace GameRes.Formats.NitroPlus
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetNPA();
+            return null;
         }
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateNPAWidget();
+            return null;
         }
 
         EncryptionScheme QueryGameEncryption (string arc_name)

@@ -217,12 +217,12 @@ namespace GameRes.Formats.NitroPlus
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetNPK (KnownKeys.Keys);
+            return null;
         }
 
         public override object GetCreationWidget ()
         {
-            return new GUI.WidgetNPK (KnownKeys.Keys);
+            return null;
         }
 
         byte[] QueryEncryption (string arc_name)

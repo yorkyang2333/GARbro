@@ -290,7 +290,7 @@ namespace GameRes.Formats.ShiinaRio // 椎名里緒
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetWARC();
+            return null;
         }
 
         EncryptionScheme QueryEncryption (string arc_name)

@@ -138,7 +138,7 @@ namespace GameRes.Formats.RenPy
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateRPAWidget();
+            return null;
         }
 
         public override void Create (Stream output, IEnumerable<Entry> list, ResourceOptions options,

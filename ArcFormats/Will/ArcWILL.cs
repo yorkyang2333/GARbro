@@ -150,7 +150,7 @@ namespace GameRes.Formats.Will
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateARCWidget();
+            return null;
         }
 
         internal class ArcEntry : Entry

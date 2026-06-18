@@ -197,23 +197,11 @@ namespace GameRes.Formats.Dac
             };
         }
 
-        public override ResourceOptions GetOptions (object w)
-        {
-            var widget = w as GUI.WidgetDPK;
-            if (null != widget)
-            {
-                uint result_key;
-                if (uint.TryParse (widget.Key1.Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result_key))
-                    Properties.Settings.Default.DPKKey1 = result_key;
-                if (uint.TryParse (widget.Key2.Text, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result_key))
-                    Properties.Settings.Default.DPKKey2 = result_key;
-            }
-            return this.GetDefaultOptions();
-        }
+        public override ResourceOptions GetOptions (object w) { return GetDefaultOptions(); }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetDPK();
+            return null;
         }
 
         public override ResourceScheme Scheme

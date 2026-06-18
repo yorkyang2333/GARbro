@@ -104,7 +104,7 @@ namespace GameRes.Formats.Ags
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetAGS (KnownSchemes.Keys);
+            return null;
         }
 
         public EncryptionScheme GetScheme (string title)

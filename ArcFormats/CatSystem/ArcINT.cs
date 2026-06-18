@@ -256,23 +256,17 @@ namespace GameRes.Formats.CatSystem
 
         public override ResourceOptions GetOptions (object w)
         {
-            var widget = w as GUI.WidgetINT;
-            if (null != widget)
-            {
-                Properties.Settings.Default.INTEncryption = widget.Info;
-                return new IntOptions { EncryptionInfo = widget.Info };
-            }
             return this.GetDefaultOptions();
         }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetINT ();
+            return null;
         }
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateINTWidget();
+            return null;
         }
 
         uint? QueryEncryptionInfo (string arc_name)

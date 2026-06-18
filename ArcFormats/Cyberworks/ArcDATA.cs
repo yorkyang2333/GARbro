@@ -230,7 +230,7 @@ namespace GameRes.Formats.Cyberworks
 
         public override object GetAccessWidget()
         {
-            return new GUI.WidgetBELLDATA();
+            return null;
         }
 
         public override ResourceOptions GetDefaultOptions() 

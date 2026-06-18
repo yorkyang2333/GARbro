@@ -176,7 +176,7 @@ namespace GameRes.Formats.DxLib
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetSCR();
+            return null;
         }
 
         public static IScriptEncryption GetEncryption (string scheme)

@@ -143,7 +143,7 @@ namespace GameRes.Formats.NitroPlus
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateSGWidget();
+            return null;
         }
 
         Encoding GetEncoding (string name)

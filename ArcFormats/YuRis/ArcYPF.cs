@@ -223,12 +223,12 @@ namespace GameRes.Formats.YuRis
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetYPF();
+            return null;
         }
 
         public override object GetCreationWidget ()
         {
-            return new GUI.CreateYPFWidget();
+            return null;
         }
 
         YpfScheme QueryEncryptionScheme (string arc_name, uint version)

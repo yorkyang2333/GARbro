@@ -25,7 +25,6 @@
 
 namespace GameRes.Formats.KiriKiri
 {
-    [Serializable]
     public class CroixCrypt : ICrypt
     {
 //        ulong    sigdata_checksum = 0xA86704CF2727BE76;

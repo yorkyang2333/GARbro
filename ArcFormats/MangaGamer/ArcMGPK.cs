@@ -188,7 +188,7 @@ namespace GameRes.Formats.Mg
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetMGPK();
+            return null;
         }
 
         public static byte[] GetKey (string title)

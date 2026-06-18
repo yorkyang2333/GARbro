@@ -54,6 +54,7 @@ namespace GameRes.Formats.CsWare
             };
             format.BlockAlign = (ushort)(format.SamplesPerSecond * format.BitsPerSample / 8);
             format.SetBPS();
+            return null;
         }
     }
 }

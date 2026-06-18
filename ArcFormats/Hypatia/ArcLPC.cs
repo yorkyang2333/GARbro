@@ -50,7 +50,7 @@ namespace GameRes.Formats.Kogado
             var dir = new List<Entry> (count);
             for (int i = 0; i < count; ++i)
             {
-                var entry = Create<Entry> (name);
+                var entry = Create<Entry> ("");
                 if (!entry.CheckPlacement (file.MaxOffset))
                     return null;
                 dir.Add (entry);

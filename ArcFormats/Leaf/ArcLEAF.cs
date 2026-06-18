@@ -134,7 +134,7 @@ namespace GameRes.Formats.Leaf
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetLEAF (KnownKeys.Keys);
+            return null;
         }
 
         byte[] GetTitleKey (string title)

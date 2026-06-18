@@ -210,7 +210,7 @@ namespace GameRes.Formats.Marble
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetMBL();
+            return null;
         }
     }
 

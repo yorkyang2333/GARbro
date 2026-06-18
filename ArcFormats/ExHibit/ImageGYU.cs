@@ -145,7 +145,7 @@ namespace GameRes.Formats.ExHibit
         public override object GetAccessWidget ()
         {
             var titles = DefaultScheme.NumericKeys.Keys.Concat (DefaultScheme.StringKeys.Keys).OrderBy (x => x);
-            return new GUI.WidgetGYU (titles);
+            return null;
         }
 
         IDictionary GetScheme (string title)

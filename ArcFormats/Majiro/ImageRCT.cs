@@ -384,17 +384,11 @@ namespace GameRes.Formats.Majiro
             return new RctOptions { Password = Properties.Settings.Default.RCTPassword };
         }
 
-        public override ResourceOptions GetOptions (object widget)
-        {
-            var w = widget as GUI.WidgetRCT;
-            if (null != w)
-                Properties.Settings.Default.RCTPassword = w.Password.Text;
-            return GetDefaultOptions();
-        }
+        public override ResourceOptions GetOptions (object w) { return GetDefaultOptions(); }
 
         public override object GetAccessWidget ()
         {
-            return new GUI.WidgetRCT();
+            return null;
         }
 
         public override void Write (Stream file, ImageData image)
