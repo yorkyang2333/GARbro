@@ -1,9 +1,8 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -52,10 +51,10 @@ namespace SchemeTool
                 crypt.RandomType = 0;
                 crypt.FilterKey = 0x0000000000000000;
                 crypt.NamesFile = "HxNames.lst";
-                var keyA1 = SoapHexBinary.Parse("0000000000000000000000000000000000000000000000000000000000000000").Value;
-                var keyA2 = SoapHexBinary.Parse("00000000000000000000000000000000").Value;
-                var keyB1 = SoapHexBinary.Parse("0000000000000000000000000000000000000000000000000000000000000000").Value;
-                var keyB2 = SoapHexBinary.Parse("00000000000000000000000000000000").Value;
+                var keyA1 = Convert.FromHexString("0000000000000000000000000000000000000000000000000000000000000000");
+                var keyA2 = Convert.FromHexString("00000000000000000000000000000000");
+                var keyB1 = Convert.FromHexString("0000000000000000000000000000000000000000000000000000000000000000");
+                var keyB2 = Convert.FromHexString("00000000000000000000000000000000");
                 crypt.IndexKeyDict = new Dictionary<string, GameRes.Formats.KiriKiri.HxIndexKey>()
                 {
                     { "data.xp3", new GameRes.Formats.KiriKiri.HxIndexKey { Key1 = keyA1, Key2 = keyA2 } },

@@ -115,7 +115,14 @@ namespace GameRes
 
         static MappedViewExtension()
         {
-            GetSystemInfo (ref info);
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                GetSystemInfo(ref info);
+            }
+            else
+            {
+                info.dwAllocationGranularity = Environment.SystemPageSize;
+            }
         }
     }
 

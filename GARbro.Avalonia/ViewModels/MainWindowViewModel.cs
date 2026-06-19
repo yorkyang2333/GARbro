@@ -17,6 +17,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        GameRes.FormatCatalog.Instance.ParametersRequest += OnParametersRequest;
+
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         if (Directory.Exists(desktop))
         {
@@ -110,13 +112,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void OpenArchive(string filePath)
     {
+        Console.WriteLine($"[OpenArchive] Called with filePath: {filePath}");
         if (string.IsNullOrEmpty(filePath)) return;
         
         try
         {
+            var formatsCount = GameRes.FormatCatalog.Instance.ArcFormats.Count();
+            Console.WriteLine($"Trying to open {filePath}, available formats: {formatsCount}");
             var arc = ArcFile.TryOpen(filePath);
             if (arc != null && arc.Dir != null)
             {
+                Console.WriteLine($"Successfully opened archive with {arc.Dir.Count()} items.");
                 CurrentArchive = arc;
                 CurrentDirectory = filePath;
                 RightPaneItems.Clear();
@@ -154,16 +160,27 @@ public partial class MainWindowViewModel : ViewModelBase
                     });
                 }
             }
+            else
+            {
+                Console.WriteLine($"Failed to open archive: ArcFile.TryOpen returned null.");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error opening archive: {ex.Message}");
+            Console.WriteLine($"Error opening archive: {ex.ToString()}");
         }
     }
-}
 
-
-
+    private void OnParametersRequest(object sender, GameRes.ParametersRequestEventArgs e)
+        {
+            var format = sender as GameRes.IResource;
+            if (format != null)
+            {
+                e.Options = format.GetDefaultOptions();
+                e.InputResult = true;
+            }
+        }
+    }
 public class EntryViewModel
 {
     public string Name { get; set; } = string.Empty;
@@ -173,5 +190,5 @@ public class EntryViewModel
     public string IconKind { get; set; } = "FileDocumentOutline";
     public bool IsDirectory { get; set; }
     public string FullPath { get; set; } = string.Empty;
-    public Entry? Entry { get; set; }
+    public GameRes.Entry? Entry { get; set; }
 }

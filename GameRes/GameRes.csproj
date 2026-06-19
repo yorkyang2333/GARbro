@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <NoWarn>SYSLIB0011;CS0114;CS0108</NoWarn>
     <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
     

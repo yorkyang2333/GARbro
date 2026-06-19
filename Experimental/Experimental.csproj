@@ -1,30 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    
-    <TargetFramework>net8.0</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    
-    <AssemblyName>ArcExtra</AssemblyName>
-    <RootNamespace>GameRes.Extra</RootNamespace>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Concentus" Version="2.2.2" />
-    <PackageReference Include="Concentus.Oggfile" Version="1.0.6" />
-    <PackageReference Include="MSFTCompressionCab" Version="1.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="SharpZipLib" Version="1.4.2" />
-    <PackageReference Include="Stub.System.Data.SQLite.Core.NetFramework" Version="1.0.119.0" />
-    <PackageReference Include="System.Buffers" Version="4.6.1" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119.0" />
-    <PackageReference Include="System.Memory" Version="4.6.3" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.6.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
-    <PackageReference Include="ZstdSharp.Port" Version="0.8.7" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="../ArcFormats/ArcFormats.csproj" />
-    <ProjectReference Include="../GameRes/GameRes.csproj" />
-  </ItemGroup>
 </Project>
