@@ -348,9 +348,9 @@ NextEntry:
                     crypt_algorithm.Value.Init (arc);
                 return arc;
             }
-            catch
+            catch (Exception X)
             {
-                arc.Dispose();
+                System.Diagnostics.Trace.WriteLine($"[ArcXP3.TryOpen] Exception during Init: {X}");
                 throw;
             }
         }

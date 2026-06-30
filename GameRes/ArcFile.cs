@@ -97,7 +97,7 @@ namespace GameRes
                     catch (Exception X)
                     {
                         // ignore failed open attmepts
-                        Trace.WriteLine (string.Format ("[{0}] {1}: {2}", impl.Tag, entry.Name, X.Message));
+                        Console.WriteLine ($"[{impl.Tag}] {entry.Name} TryOpen threw exception: {X}");
                         FormatCatalog.Instance.LastError = X;
                     }
                 }

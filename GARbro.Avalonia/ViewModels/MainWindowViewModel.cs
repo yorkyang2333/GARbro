@@ -189,8 +189,8 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             else
             {
-                var errorMsg = GameRes.FormatCatalog.Instance.LastError?.Message ?? "ArcFile.TryOpen returned null.";
-                Console.WriteLine($"Failed to open archive: {errorMsg}");
+                var errorMsg = GameRes.FormatCatalog.Instance.LastError?.ToString() ?? "ArcFile.TryOpen returned null.";
+                Console.WriteLine($"Failed to open archive:\n{errorMsg}");
                 
                 global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
                     if (_autoScanDialog != null)
@@ -201,7 +201,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     var desktop = global::Avalonia.Application.Current?.ApplicationLifetime as global::Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
                     if (desktop?.MainWindow != null)
                     {
-                        var errorDialog = new Views.ErrorDialog($"Failed to open archive.\nError: {errorMsg}");
+                        var errorDialog = new Views.ErrorDialog($"Failed to open archive.\nError: {GameRes.FormatCatalog.Instance.LastError?.Message ?? "ArcFile.TryOpen returned null."}");
                         errorDialog.ShowDialog(desktop.MainWindow);
                     }
                 });
