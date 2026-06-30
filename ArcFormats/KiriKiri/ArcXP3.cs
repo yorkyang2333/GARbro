@@ -434,31 +434,152 @@ NextEntry:
 
         public static Action<string> AutoDetectProgress;
 
-        public ICrypt AutoDetectCryptAlgorithm(ArcView file)
+        public static ICrypt AutoDetectCryptAlgorithm(ArcView file)
         {
-            var header = file.View.ReadBytes (0, (uint)System.Math.Min(0x1000, file.MaxOffset));
-            var schemes = KnownSchemes.Values.Distinct().ToList();
-            foreach (var scheme in schemes)
+            long base_offset = 0;
+            if (0x5a4d == file.View.ReadUInt16(0)) // 'MZ'
+                base_offset = SkipExeHeader(file, s_xp3_header);
+            long dir_offset = base_offset + file.View.ReadInt64(base_offset + 0x0b);
+            if (0x80 == file.View.ReadUInt32(dir_offset))
+                dir_offset = base_offset + file.View.ReadInt64(dir_offset + 9);
+            int header_type = file.View.ReadByte(dir_offset);
+
+            Stream header_stream;
+            if (0 == header_type) // read unpacked header
             {
-                if (scheme is NoCrypt || scheme == null) continue;
-                var schemeName = KnownSchemes.FirstOrDefault(x => x.Value == scheme).Key ?? "Unknown";
-                AutoDetectProgress?.Invoke(schemeName);
-                
-                try
-                {
-                    // Basically just return it, TryOpen will use it and fail if wrong
-                }
-                catch { }
+                long header_size = file.View.ReadInt64(dir_offset + 1);
+                header_stream = file.CreateStream(dir_offset + 9, (uint)header_size);
             }
-            return NoCryptAlgorithm;
+            else // read packed header
+            {
+                long packed_size = file.View.ReadInt64(dir_offset + 1);
+                using (var input = file.CreateStream(dir_offset + 17, (uint)packed_size))
+                    header_stream = GameRes.Compression.ZLibCompressor.DeCompress(input);
+            }
+
+            var schemes = KnownSchemes.Values.Distinct().ToList();
+            ICrypt bestScheme = null;
+            int bestScore = -1;
+
+            using (header_stream)
+            {
+                foreach (var scheme in schemes)
+                {
+                    if (scheme == null || scheme is NoCrypt) continue;
+
+                    var schemeName = KnownSchemes.FirstOrDefault(x => x.Value == scheme).Key ?? "Unknown";
+                    AutoDetectProgress?.Invoke(schemeName);
+
+                    try
+                    {
+                        header_stream.Position = 0;
+                        using (var header = new BinaryReader(header_stream, Encoding.Unicode, true))
+                        {
+                            int score = 0;
+                            int filesTested = 0;
+                            while (-1 != header.PeekChar() && filesTested < 10)
+                            {
+                                uint entry_signature = header.ReadUInt32();
+                                long entry_size = header.ReadInt64();
+                                if (entry_size < 0) break;
+
+                                if (0x656C6946 == entry_signature) // "File"
+                                {
+                                    while (entry_size > 0)
+                                    {
+                                        uint section = header.ReadUInt32();
+                                        long section_size = header.ReadInt64();
+                                        entry_size -= 12;
+                                        if (section_size > entry_size)
+                                        {
+                                            if (section != 0x6f666e69) break;
+                                            section_size = entry_size;
+                                        }
+                                        entry_size -= section_size;
+                                        long next_section_pos = header.BaseStream.Position + section_size;
+
+                                        if (section == 0x6f666e69) // "info"
+                                        {
+                                            header.ReadUInt32(); // isEncrypted
+                                            header.ReadInt64(); // file_size
+                                            header.ReadInt64(); // packed_size
+
+                                            string name = scheme.ReadName(header);
+                                            if (!string.IsNullOrEmpty(name))
+                                            {
+                                                if (name.EndsWith(".tjs", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".ks", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".csv", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".asd", StringComparison.OrdinalIgnoreCase) ||
+                                                    name.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    score += 10;
+                                                }
+                                                else if (IsReasonableString(name))
+                                                {
+                                                    score += 1;
+                                                }
+                                                else
+                                                {
+                                                    score -= 5;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                score -= 10;
+                                            }
+                                            filesTested++;
+                                        }
+                                        header.BaseStream.Position = next_section_pos;
+                                    }
+                                }
+                                else
+                                {
+                                    header.BaseStream.Position += entry_size;
+                                }
+                            }
+
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                bestScheme = scheme;
+                                if (bestScore >= 20)
+                                {
+                                    return bestScheme;
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            return bestScheme ?? NoCryptAlgorithm;
+        }
+
+        private static bool IsReasonableString(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return false;
+            foreach (char c in s)
+            {
+                if (char.IsControl(c) && c != '\t' && c != '\r' && c != '\n') return false;
+                if (c == 0xFFFD) return false;
+            }
+            return true;
         }
 
         ICrypt QueryCryptAlgorithm (ArcView file)
         {
-            var alg = GuessCryptAlgorithm (file);
-            // if (null != alg)
-            //    return alg;
-            var options = Query<Xp3Options> (arcStrings.XP3EncryptedNotice);
+            if (!ForceEncryptionQuery)
+            {
+                var alg = GuessCryptAlgorithm(file);
+                if (null != alg)
+                    return alg;
+            }
+            var options = Query<Xp3Options>(arcStrings.XP3EncryptedNotice);
             if (options != null && options.Scheme is AutoDetectCrypt)
             {
                 return AutoDetectCryptAlgorithm(file);

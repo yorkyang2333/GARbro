@@ -10,7 +10,13 @@
         <TextBlock Name="NoticeTextBlock" TextWrapping="Wrap" />
         
         <TextBlock Text="Select Decryption Scheme:" FontWeight="Bold"/>
-        <ComboBox Name="SchemeComboBox" HorizontalAlignment="Stretch" />
+        <ComboBox Name="SchemeComboBox" HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" MaxWidth="300" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         
         <CheckBox Name="SaveSchemeCheckBox" Content="Remember selected scheme" />
 
