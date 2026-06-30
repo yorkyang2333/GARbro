@@ -106,7 +106,7 @@ namespace GameRes.Formats.KiriKiri
                 throw new InvalidEncryptionScheme();
 
             var dir_name = VFS.GetDirectoryName (arc.File.Name);
-            var tpm_name = VFS.CombinePath (dir_name, TpmFileName);
+            var tpm_name = VFS.CombinePath (dir_name, TpmFileName.Replace('\\', System.IO.Path.DirectorySeparatorChar));
             using (var tpm = VFS.OpenView (tpm_name))
             {
                 if (tpm.MaxOffset < 0x1000 || tpm.MaxOffset > uint.MaxValue)
