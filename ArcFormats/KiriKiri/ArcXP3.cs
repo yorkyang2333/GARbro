@@ -461,6 +461,18 @@ NextEntry:
             ICrypt bestScheme = null;
             int bestScore = -1;
 
+            long startPos = header_stream.Position;
+            var peekBuffer = new byte[4];
+            if (header_stream.Read(peekBuffer, 0, 4) == 4)
+            {
+                uint first_signature = BitConverter.ToUInt32(peekBuffer, 0);
+                if (first_signature == 0x757A7559) // "Yuzu"
+                {
+                    return new YuzuCrypt();
+                }
+            }
+            header_stream.Position = startPos;
+
             using (header_stream)
             {
                 foreach (var scheme in schemes)
@@ -469,6 +481,16 @@ NextEntry:
 
                     var schemeName = KnownSchemes.FirstOrDefault(x => x.Value == scheme).Key ?? "Unknown";
                     AutoDetectProgress?.Invoke(schemeName);
+
+                    try
+                    {
+                        var dummyArc = new ArcFile(file, new Xp3Opener(), new List<Entry>());
+                        scheme.Init(dummyArc);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
                     try
                     {
