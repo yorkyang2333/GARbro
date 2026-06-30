@@ -189,19 +189,40 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             else
             {
-                Console.WriteLine($"Failed to open archive: ArcFile.TryOpen returned null.");
+                var errorMsg = GameRes.FormatCatalog.Instance.LastError?.Message ?? "ArcFile.TryOpen returned null.";
+                Console.WriteLine($"Failed to open archive: {errorMsg}");
+                
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+                    if (_autoScanDialog != null)
+                    {
+                        _autoScanDialog.Close();
+                        _autoScanDialog = null;
+                    }
+                    var desktop = global::Avalonia.Application.Current?.ApplicationLifetime as global::Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                    if (desktop?.MainWindow != null)
+                    {
+                        var errorDialog = new Views.ErrorDialog($"Failed to open archive.\nError: {errorMsg}");
+                        errorDialog.ShowDialog(desktop.MainWindow);
+                    }
+                });
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error opening archive: {ex.ToString()}");
-            if (_autoScanDialog != null)
-            {
-                global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+                if (_autoScanDialog != null)
+                {
                     _autoScanDialog.Close();
                     _autoScanDialog = null;
-                });
-            }
+                }
+                var desktop = global::Avalonia.Application.Current?.ApplicationLifetime as global::Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                if (desktop?.MainWindow != null)
+                {
+                    var errorDialog = new Views.ErrorDialog($"Exception occurred while opening archive.\nError: {ex.Message}");
+                    errorDialog.ShowDialog(desktop.MainWindow);
+                }
+            });
         }
     }
 
@@ -221,28 +242,37 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     var desktop = global::Avalonia.Application.Current?.ApplicationLifetime as global::Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
                     var mainWindow = desktop?.MainWindow;
+                    
+                    Console.WriteLine($"[OnParametersRequest] desktop: {desktop != null}, mainWindow: {mainWindow != null}");
 
                     if (mainWindow != null)
                     {
+                        Console.WriteLine($"[OnParametersRequest] Showing dialog...");
                         var dialog = new Views.ManualSchemeDialog();
                         dialog.NoticeText = e.Notice;
                         var res = await dialog.ShowDialog<GameRes.ResourceOptions>(mainWindow);
                         if (res != null)
                         {
+                            Console.WriteLine($"[OnParametersRequest] Dialog returned result");
                             options = res;
                             result = true;
 
                             if (options is GameRes.Formats.KiriKiri.Xp3Options xp3Options && xp3Options.Scheme is GameRes.Formats.KiriKiri.AutoDetectCrypt)
                             {
+                                Console.WriteLine($"[OnParametersRequest] Showing AutoScanDialog...");
                                 _autoScanDialog = new Views.AutoScanDialog();
                                 _autoScanDialog.Show(mainWindow);
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[OnParametersRequest] Dialog returned null (cancelled)");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    System.IO.File.AppendAllText("garbro_error.txt", "Dialog exception: " + ex.ToString() + "\n");
+                    Console.WriteLine($"[OnParametersRequest] Exception: {ex}");
                 }
                 finally
                 {
