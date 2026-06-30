@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GameRes;
@@ -93,7 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ItemDoubleClicked(EntryViewModel? item)
+    private async Task ItemDoubleClicked(EntryViewModel? item)
     {
         if (item == null) return;
 
@@ -103,14 +104,16 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            OpenArchive(item.FullPath);
+            await OpenArchive(item.FullPath);
         }
     }
 
     [ObservableProperty]
     private ArcFile? _currentArchive;
 
-    public void OpenArchive(string filePath)
+    private Views.AutoScanDialog? _autoScanDialog;
+
+    public async Task OpenArchive(string filePath)
     {
         Console.WriteLine($"[OpenArchive] Called with filePath: {filePath}");
         if (string.IsNullOrEmpty(filePath)) return;
@@ -119,7 +122,31 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             var formatsCount = GameRes.FormatCatalog.Instance.ArcFormats.Count();
             Console.WriteLine($"Trying to open {filePath}, available formats: {formatsCount}");
-            var arc = ArcFile.TryOpen(filePath);
+            
+            // Run TryOpen on a background thread to allow OnParametersRequest to block for UI
+            var arc = await Task.Run(() => {
+                GameRes.Formats.KiriKiri.Xp3Opener.AutoDetectProgress = (scheme) => {
+                    if (_autoScanDialog != null)
+                    {
+                        global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+                            if (_autoScanDialog != null)
+                                _autoScanDialog.CurrentScheme = scheme;
+                        });
+                    }
+                };
+
+                return ArcFile.TryOpen(filePath);
+            });
+            
+            // Close the auto scan dialog if it was shown
+            if (_autoScanDialog != null)
+            {
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+                    _autoScanDialog.Close();
+                    _autoScanDialog = null;
+                });
+            }
+
             if (arc != null && arc.Dir != null)
             {
                 Console.WriteLine($"Successfully opened archive with {arc.Dir.Count()} items.");
@@ -168,19 +195,81 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             Console.WriteLine($"Error opening archive: {ex.ToString()}");
+            if (_autoScanDialog != null)
+            {
+                global::Avalonia.Threading.Dispatcher.UIThread.Post(() => {
+                    _autoScanDialog.Close();
+                    _autoScanDialog = null;
+                });
+            }
         }
     }
 
     private void OnParametersRequest(object sender, GameRes.ParametersRequestEventArgs e)
+    {
+        var format = sender as GameRes.IResource;
+        if (format == null) return;
+        
+        if (format.Tag == "XP3")
         {
-            var format = sender as GameRes.IResource;
-            if (format != null)
+            bool result = false;
+            GameRes.ResourceOptions? options = null;
+            var tcs = new System.Threading.Tasks.TaskCompletionSource<bool>();
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(async () => 
             {
-                e.Options = format.GetDefaultOptions();
+                try
+                {
+                    var desktop = global::Avalonia.Application.Current?.ApplicationLifetime as global::Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                    var mainWindow = desktop?.MainWindow;
+
+                    if (mainWindow != null)
+                    {
+                        var dialog = new Views.ManualSchemeDialog();
+                        dialog.NoticeText = e.Notice;
+                        var res = await dialog.ShowDialog<GameRes.ResourceOptions>(mainWindow);
+                        if (res != null)
+                        {
+                            options = res;
+                            result = true;
+
+                            if (options is GameRes.Formats.KiriKiri.Xp3Options xp3Options && xp3Options.Scheme is GameRes.Formats.KiriKiri.AutoDetectCrypt)
+                            {
+                                _autoScanDialog = new Views.AutoScanDialog();
+                                _autoScanDialog.Show(mainWindow);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.IO.File.AppendAllText("garbro_error.txt", "Dialog exception: " + ex.ToString() + "\n");
+                }
+                finally
+                {
+                    tcs.SetResult(true);
+                }
+            });
+            tcs.Task.GetAwaiter().GetResult();
+
+            if (result)
+            {
+                e.Options = options;
                 e.InputResult = true;
             }
+            else
+            {
+                e.Options = format.GetDefaultOptions();
+                e.InputResult = false;
+            }
+        }
+        else
+        {
+            e.Options = format.GetDefaultOptions();
+            e.InputResult = true;
         }
     }
+}
+
 public class EntryViewModel
 {
     public string Name { get; set; } = string.Empty;

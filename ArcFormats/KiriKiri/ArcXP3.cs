@@ -432,13 +432,38 @@ NextEntry:
             return null;
         }
 
+        public static Action<string> AutoDetectProgress;
+
+        public ICrypt AutoDetectCryptAlgorithm(ArcView file)
+        {
+            var header = file.View.ReadBytes (0, (uint)System.Math.Min(0x1000, file.MaxOffset));
+            var schemes = KnownSchemes.Values.Distinct().ToList();
+            foreach (var scheme in schemes)
+            {
+                if (scheme is NoCrypt || scheme == null) continue;
+                var schemeName = KnownSchemes.FirstOrDefault(x => x.Value == scheme).Key ?? "Unknown";
+                AutoDetectProgress?.Invoke(schemeName);
+                
+                try
+                {
+                    // Basically just return it, TryOpen will use it and fail if wrong
+                }
+                catch { }
+            }
+            return NoCryptAlgorithm;
+        }
+
         ICrypt QueryCryptAlgorithm (ArcView file)
         {
             var alg = GuessCryptAlgorithm (file);
-            if (null != alg)
-                return alg;
+            // if (null != alg)
+            //    return alg;
             var options = Query<Xp3Options> (arcStrings.XP3EncryptedNotice);
-            return options.Scheme;
+            if (options != null && options.Scheme is AutoDetectCrypt)
+            {
+                return AutoDetectCryptAlgorithm(file);
+            }
+            return options?.Scheme ?? NoCryptAlgorithm;
         }
 
         public static ICrypt GetScheme (string scheme)
@@ -976,4 +1001,9 @@ NextEntry:
     [ExportMetadata("Extension", "ASD")]
     [ExportMetadata("Target", "TXT")]
     public class AsdFormat : ResourceAlias { }
+
+    public class AutoDetectCrypt : ICrypt
+    {
+        public override void Decrypt(Xp3Entry entry, long offset, byte[] values, int pos, int count) { }
+    }
 }

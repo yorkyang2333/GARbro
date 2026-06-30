@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GARbro.Avalonia.Views.AutoScanDialog"
+        Title="Auto-Detect Scheme"
+        Width="350" Height="150"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        SystemDecorations="BorderOnly">
+    
+    <StackPanel Margin="20" Spacing="15" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock Text="Auto-Detecting Encryption Scheme..." FontWeight="Bold" FontSize="16" />
+        <ProgressBar IsIndeterminate="True" HorizontalAlignment="Stretch" />
+        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <TextBlock Text="Testing:" />
+            <TextBlock Name="CurrentSchemeTextBlock" FontStyle="Italic" Text="..." />
+        </StackPanel>
+    </StackPanel>
+</Window>

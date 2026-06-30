@@ -62,7 +62,7 @@ public partial class MainWindow : Window
                 }
                 else
                 {
-                    vm.NavigateToCommand.Execute(item.FullPath);
+                    _ = vm.OpenArchive(item.FullPath);
                 }
             }
         }
@@ -85,7 +85,8 @@ public partial class MainWindow : Window
 
         if (files.Count > 0 && DataContext is MainWindowViewModel vm)
         {
-            vm.OpenArchive(files[0].Path.LocalPath);
+            var filePath = files[0].TryGetLocalPath() ?? files[0].Path.LocalPath;
+            await vm.OpenArchive(filePath);
         }
     }
 
