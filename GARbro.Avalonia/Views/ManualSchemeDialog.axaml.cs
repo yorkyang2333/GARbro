@@ -9,7 +9,7 @@ namespace GARbro.Avalonia.Views
 {
     public partial class ManualSchemeDialog : Window
     {
-        public string NoticeText
+        public string? NoticeText
         {
             get => NoticeTextBlock.Text;
             set => NoticeTextBlock.Text = value;

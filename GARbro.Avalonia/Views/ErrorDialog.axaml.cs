@@ -12,7 +12,11 @@ namespace GARbro.Avalonia.Views
 
         public ErrorDialog(string message) : this()
         {
-            this.FindControl<TextBlock>("MessageText").Text = message;
+            var msgText = this.FindControl<TextBlock>("MessageText");
+            if (msgText != null)
+            {
+                msgText.Text = message;
+            }
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
