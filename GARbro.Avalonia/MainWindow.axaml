@@ -36,15 +36,18 @@
 
         <!-- Address Bar -->
         <Border Grid.Row="1" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" Padding="5">
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
-                <Button Grid.Column="0" Margin="0,0,5,0" Width="32" Height="32" Padding="4">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+                <Button Grid.Column="0" Margin="0,0,5,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateBackCommand}">
                     <materialIcons:MaterialIcon Kind="ArrowLeft" />
                 </Button>
-                <Button Grid.Column="1" Margin="0,0,5,0" Width="32" Height="32" Padding="4">
+                <Button Grid.Column="1" Margin="0,0,5,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateForwardCommand}">
                     <materialIcons:MaterialIcon Kind="ArrowRight" />
                 </Button>
-                <TextBox Grid.Column="2" Text="{Binding CurrentDirectory}" VerticalAlignment="Center"/>
-                <Button Grid.Column="3" Margin="5,0,0,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateToCommand}" CommandParameter="{Binding CurrentDirectory}">
+                <Button Grid.Column="2" Margin="0,0,5,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateUpCommand}">
+                    <materialIcons:MaterialIcon Kind="ArrowUp" />
+                </Button>
+                <TextBox Grid.Column="3" Text="{Binding CurrentDirectory}" VerticalAlignment="Center"/>
+                <Button Grid.Column="4" Margin="5,0,0,0" Width="32" Height="32" Padding="4" Command="{Binding NavigateToCommand}" CommandParameter="{Binding CurrentDirectory}">
                     <materialIcons:MaterialIcon Kind="Refresh" />
                 </Button>
             </Grid>
@@ -61,7 +64,7 @@
                 </ContextMenu>
             </DataGrid.ContextMenu>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Name" Width="*">
+                    <DataGridTemplateColumn Header="Name" Width="*" SortMemberPath="Name">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5" Margin="5,0">
@@ -71,9 +74,8 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100"/>
-                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="100"/>
-                    <DataGridTextColumn Header="Offset" Binding="{Binding Offset}" Width="100"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" SortMemberPath="Type" Width="100"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding DisplaySize}" SortMemberPath="Size" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>
     </Grid>

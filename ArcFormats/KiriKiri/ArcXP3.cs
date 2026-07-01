@@ -341,6 +341,28 @@ NextEntry:
             }
             if (0 == dir.Count)
                 return null;
+            bool hasNekoNyanObfuscation = false;
+            var test_png = dir.FirstOrDefault(e => e.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) as Xp3Entry;
+            if (test_png != null && !test_png.IsEncrypted && test_png.Segments.Count == 1)
+            {
+                uint magic = file.View.ReadUInt32(test_png.Offset);
+                if (magic == 0x48415F86) // XORed PNG magic
+                {
+                    hasNekoNyanObfuscation = true;
+                }
+            }
+
+            if (hasNekoNyanObfuscation)
+            {
+                var crypt = crypt_algorithm.Value;
+                foreach (Xp3Entry entry in dir)
+                {
+                    entry.IsEncrypted = true;
+                    if (crypt != null)
+                        entry.Cipher = crypt;
+                }
+            }
+
             var arc = new ArcFile (file, this, dir);
             try
             {
@@ -599,6 +621,10 @@ NextEntry:
             {
                 var alg = GuessCryptAlgorithm(file);
                 if (null != alg)
+                    return alg;
+
+                alg = AutoDetectCryptAlgorithm(file);
+                if (null != alg && !(alg is NoCrypt))
                     return alg;
             }
             var options = Query<Xp3Options>(arcStrings.XP3EncryptedNotice);

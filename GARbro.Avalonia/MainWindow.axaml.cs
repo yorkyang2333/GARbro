@@ -1,10 +1,13 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using GARbro.Avalonia.ViewModels;
+using GARbro.Avalonia.Views;
 using GameRes;
 
 namespace GARbro.Avalonia;
@@ -24,45 +27,44 @@ public partial class MainWindow : Window
             {
                 if (item.IsDirectory)
                 {
-                    vm.NavigateToCommand.Execute(item.FullPath);
+                    vm.ItemDoubleClickedCommand.Execute(item);
                 }
-                else if (item.Entry != null && vm.CurrentArchive != null)
+                else if (item.IsVirtual && item.Entry != null && vm.CurrentArchive != null)
                 {
                     try
                     {
-                        if (item.Entry.Type == "image")
+                        var tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "GARbro_Temp");
+                        System.IO.Directory.CreateDirectory(tempDir);
+                        string destFile = System.IO.Path.Combine(tempDir, System.IO.Path.GetFileName(item.Entry.Name));
+                        
+                        using (var stream = vm.CurrentArchive.OpenEntry(item.Entry))
+                        using (var fs = System.IO.File.Create(destFile))
                         {
-                            var stream = vm.CurrentArchive.OpenEntry(item.Entry);
-                            var binStream = new GameRes.BinaryStream(stream, item.Entry.Name);
-                            var image = ImageFormat.Read(binStream);
-                            if (image != null)
-                            {
-                                var viewer = new ImageViewerWindow();
-                                viewer.LoadImage(item.Entry, image);
-                                await viewer.ShowDialog(this);
-                            }
+                            stream.CopyTo(fs);
                         }
-                        else if (item.Entry.Type == "audio")
+
+                        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
                         {
-                            var stream = vm.CurrentArchive.OpenEntry(item.Entry);
-                            var binStream = new GameRes.BinaryStream(stream, item.Entry.Name);
-                            var audio = AudioFormat.Read(binStream);
-                            if (audio != null)
-                            {
-                                var player = new AudioPlayerWindow();
-                                player.LoadAudio(item.Entry, audio);
-                                await player.ShowDialog(this);
-                            }
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $"/select,\"{destFile}\"") { UseShellExecute = true });
+                        }
+                        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("open", $"-R \"{destFile}\"") { UseShellExecute = true });
+                        }
+                        else
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("xdg-open", $"\"{tempDir}\"") { UseShellExecute = true });
                         }
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error opening entry: {ex.Message}");
+                        var errorDialog = new Views.ErrorDialog($"Error opening entry:\n{ex.Message}\n{ex.StackTrace}");
+                        _ = errorDialog.ShowDialog(this);
                     }
                 }
-                else
+                else if (!item.IsVirtual)
                 {
-                    _ = vm.OpenArchive(item.FullPath);
+                    vm.ItemDoubleClickedCommand.Execute(item);
                 }
             }
         }
@@ -120,23 +122,47 @@ public partial class MainWindow : Window
     {
         if (DataContext is MainWindowViewModel vm && vm.CurrentArchive != null)
         {
-            var selectedItems = FileGrid.SelectedItems.Cast<EntryViewModel>().Where(i => i.Entry != null).ToList();
-            if (selectedItems.Count == 0) return;
-
-            var storageProvider = this.StorageProvider;
-            var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            var selectedEntries = new List<GameRes.Entry>();
+            foreach (var item in FileGrid.SelectedItems.Cast<EntryViewModel>())
             {
-                Title = "Select Destination Folder",
-                AllowMultiple = false
-            });
-
-            if (folders.Count > 0)
-            {
-                var destination = folders[0].Path.LocalPath;
-                var progressWindow = new ProgressWindow();
-                progressWindow.StartExtraction(vm.CurrentArchive, selectedItems.Select(i => i.Entry!).ToList(), destination);
-                await progressWindow.ShowDialog(this);
+                if (item.Entry != null)
+                {
+                    selectedEntries.Add(item.Entry);
+                }
+                else if (item.IsDirectory && item.IsVirtual && item.Name != "..")
+                {
+                    var prefix = item.FullPath + "/";
+                    selectedEntries.AddRange(vm.CurrentArchive.Dir.Where(e => e.Name.Replace('\\', '/').StartsWith(prefix, StringComparison.OrdinalIgnoreCase)));
+                }
             }
+
+            if (selectedEntries.Count == 0) return;
+
+            global::Avalonia.Threading.Dispatcher.UIThread.Post(async () =>
+            {
+                try
+                {
+                    var storageProvider = this.StorageProvider;
+                    var folders = await storageProvider.OpenFolderPickerAsync(new global::Avalonia.Platform.Storage.FolderPickerOpenOptions
+                    {
+                        Title = "Select Destination Folder",
+                        AllowMultiple = false
+                    });
+
+                    if (folders.Count > 0)
+                    {
+                        await Task.Delay(100); // Workaround for Avalonia macOS native dialog teardown deadlock
+                        var destination = folders[0].Path.LocalPath;
+                        var progressWindow = new ProgressWindow(vm.CurrentArchive, selectedEntries, destination);
+                        await progressWindow.ShowDialog(this);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var errorDialog = new Views.ErrorDialog($"Unexpected error during extraction setup:\n{ex.Message}\n{ex.StackTrace}");
+                    await errorDialog.ShowDialog(this);
+                }
+            });
         }
     }
 }
